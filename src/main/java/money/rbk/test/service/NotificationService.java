@@ -31,7 +31,7 @@ public class NotificationService {
 
         try {
             Template template = freemarkerConfig.getTemplate("report.ftl"); // todo move to props
-            try (Writer fileWriter = new FileWriter(new File(String.format("reportDir/report - %s.txt", sdf.format(new Date()))))) {
+            try (Writer fileWriter = new FileWriter(new File(String.format("reportDir/report%s.txt", sdf.format(new Date()))))) {
                 template.process(result, fileWriter);
             }
         } catch (IOException | TemplateException e) {
