@@ -15,7 +15,7 @@ import java.util.List;
 import static money.rbk.test.entity.OuterDataEntity.Status.*;
 
 /**
- * Main processing controller
+ * Main processing service
  */
 
 @Service
@@ -30,12 +30,12 @@ public class ReconciliationService {
     public ReconciliationResult reconciliation() {
         ReconciliationResult reconciliationResult = new ReconciliationResult();
 
-        List<OuterDataEntity> newOuterDataEntriesList = outerDataTransactionController.findAllOuterDataEntitiesWithStatuses(NEW, NEED_CHECK);
+        List<OuterDataEntity> newOuterDataEntriesList = outerDataTransactionController.findAllOuterDataEntitiesWithStatuses(NEW, NEED_CHECK); // looking for undone transaction records from outer source
         TransactionEntity storedTransaction;
 
         for (OuterDataEntity newOuterDataEntry : newOuterDataEntriesList) {
             try {
-                storedTransaction = transactionsController.getWithTransactionId(newOuterDataEntry.getTransactionId());
+                storedTransaction = transactionsController.getWithTransactionId(newOuterDataEntry.getTransactionId()); // fetch transaction from transaction table
             } catch (IncorrectResultSizeDataAccessException e) {
                 log.error("Not unique transaction record in database. Transaction id is: %d", newOuterDataEntry.getId()); // not sure if this will happen
 //                reconciliationResult.getNotUniqueDbRecordsIdList().add(newOuterDataEntry.getTransactionId());
@@ -48,6 +48,7 @@ public class ReconciliationService {
                 // mark as wrong amount
                 reconciliationResult.getDiscrepancyList().add(newOuterDataEntry);
             } else {
+                // mark as correct one
                 reconciliationResult.getConformityList().add(newOuterDataEntry);
             }
             markAsProcessed(newOuterDataEntry);

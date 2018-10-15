@@ -28,7 +28,7 @@ import static money.rbk.test.entity.OuterDataEntity.Status.NEED_CHECK;
 import static money.rbk.test.entity.OuterDataEntity.Status.NEW;
 
 /**
- * Controller which prepares input data from outer resource
+ * Service which prepares input data from outer resource
  */
 
 @Service
@@ -38,6 +38,11 @@ public class OuterDataTransactionProcessingService {
     @Autowired
     private OuterDataRepository outerDataRepository;
 
+    /**
+     * check outer information before store it
+     *
+     * @param outerDataContent
+     */
     public void processOuterInformation(String outerDataContent) {
         List<TransactionsFile> objectsFromCsv = getObjectsFromCsv(outerDataContent);
         if (objectsFromCsv.isEmpty()) {
@@ -58,6 +63,13 @@ public class OuterDataTransactionProcessingService {
         storeData(transactionsFile);
     }
 
+    /**
+     * If transaction is already read from outer source
+     *
+     * @param transactionId
+     * @return
+     * @throws IncorrectResultSizeDataAccessException - emergency situation. Should not occur
+     */
     private OuterDataEntity getCounterpart(Long transactionId) throws IncorrectResultSizeDataAccessException {
         try {
             return outerDataRepository.findByTransactionId(transactionId);
@@ -73,14 +85,14 @@ public class OuterDataTransactionProcessingService {
             try {
                 counterpart = getCounterpart(record.getPid().longValue());
             } catch (IncorrectResultSizeDataAccessException e) {
-                continue;
+                continue; // we log it and skip it
             }
-            if (counterpart != null) {
-                counterpart.setStatus(NEED_CHECK);
-                counterpart.setAmount(record.getPamount());
+            if (counterpart != null) {                      // if we already have information about this transaction from outer source
+                counterpart.setStatus(NEED_CHECK);          // we better check it again. Probably amount has been changed
+                counterpart.setAmount(record.getPamount()); // get amount from outer source
                 counterpart.setData(record.getPdata().toString());
                 outerDataRepository.save(counterpart);
-            } else {
+            } else {                                        // if we don't have it, so it's new
                 outerDataRepository.save(OuterDataEntity.createFromPlainData(record.getPid().longValue(), record.getPamount(),
                         record.getPdata().toString(), NEW)
                 );
@@ -88,8 +100,15 @@ public class OuterDataTransactionProcessingService {
         }
     }
 
+    /**
+     * Any cases. Should be useful. Present information from outer source in xml format, or any other..
+     * @param resourceSet - set of available resources
+     * @param resource - my specified resource, which contains information from outer source
+     * @return
+     * @throws IOException
+     */
     private String getResourceAsXML(XtextResourceSet resourceSet, Resource resource) throws IOException {
-        Resource resource1 = resourceSet.createResource(URI.createURI("name.xmi"));
+        Resource resource1 = resourceSet.createResource(URI.createURI("name.xmi")); // resource for new presentation
         resource1.getContents().addAll(resource.getContents());
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         resource1.save(byteArrayOutputStream, Collections.EMPTY_MAP);
@@ -97,7 +116,8 @@ public class OuterDataTransactionProcessingService {
     }
 
     /**
-     * Processing csv data
+     * Processing csv data with xtext.
+     * I used xtext because it's easily and clearly and more useful than parse it with fasterxml as an example.
      *
      * @param outerDataContent csv data from outer source
      */
@@ -105,23 +125,24 @@ public class OuterDataTransactionProcessingService {
     @SuppressWarnings("unchecked")
     private List<TransactionsFile> getObjectsFromCsv(String outerDataContent) {
 
-        RbkMoneyDslStandaloneSetup.doSetup(); // init model
+        RbkMoneyDslStandaloneSetup.doSetup(); // init dsl model. It's standalone because it can work without eclipse and stuff
         RbkMoneyDslStandaloneSetupGenerated sg = new RbkMoneyDslStandaloneSetup();
         final Injector injector = sg.createInjector(); // get injector to get environment members
 
-//        XMIResourceFactoryImpl resourceFactory = new XMIResourceFactoryImpl();
         ByteArrayInputStream inputStream = new ByteArrayInputStream(outerDataContent.getBytes());
         XtextResourceSet resourceSet = injector.getInstance(XtextResourceSet.class);
 
-        Resource resource = resourceSet.createResource(URI.createURI("name.rbkdsl"));
+        Resource resource = resourceSet.createResource(URI.createURI("name.rbkdsl")); // *.rbkdsl my own dsl to read ptxs.csv using format
         try {
-            resource.load(inputStream, Collections.EMPTY_MAP);
+            resource.load(inputStream, Collections.EMPTY_MAP); // no args
         } catch (IOException e) {
             log.error("Error while reading from resource");
             return Collections.EMPTY_LIST;
         }
         return (List<TransactionsFile>) (EList) resource.getContents(); // i am 100% sure in this cast
     }
+
+    // utility methods
 
     public List<OuterDataEntity> findAllOuterDataEntitiesWithStatuses(OuterDataEntity.Status... statuses) {
         return outerDataRepository.findAllByStatuses(statuses);

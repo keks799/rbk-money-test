@@ -7,13 +7,16 @@ import money.rbk.test.entity.OuterDataEntity;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Reconciliation result model for report
+ */
 @Getter
 @Setter
 public class ReconciliationResult {
 
-    private List<OuterDataEntity> conformityList = new ArrayList<>();
-    private List<OuterDataEntity> discrepancyList = new ArrayList<>();
-    private List<OuterDataEntity> notFoundList = new ArrayList<>();
+    private List<OuterDataEntity> conformityList = new ArrayList<>();   // transactions which are matched correctly
+    private List<OuterDataEntity> discrepancyList = new ArrayList<>();  // transactions which doesn't matched
+    private List<OuterDataEntity> notFoundList = new ArrayList<>();     // transactions which don't found in transaction table
 //    private Set<Long> notUniqueDbRecordsIdList = new HashSet<>();
 
     private void logResult(StringBuilder builder, List<OuterDataEntity> list) {

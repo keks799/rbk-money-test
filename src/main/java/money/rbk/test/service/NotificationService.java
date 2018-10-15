@@ -17,7 +17,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
- * Prepare output data controller
+ * Prepare output data service
  */
 
 @Service

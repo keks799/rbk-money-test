@@ -8,6 +8,10 @@ import lombok.Setter;
 
 import java.math.BigDecimal;
 
+/**
+ * Outer data model to parse it with fasterxml. Not need after xcode implementation
+ */
+
 @Getter
 @Setter
 @JsonIgnoreProperties(ignoreUnknown = true)

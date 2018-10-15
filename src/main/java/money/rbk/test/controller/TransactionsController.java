@@ -5,6 +5,9 @@ import money.rbk.test.service.TransactionsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
+/**
+ * Controller to work with transactions already stored in db (transaction table. Not outer source transaction records)
+ */
 @Controller
 public class TransactionsController {
 
