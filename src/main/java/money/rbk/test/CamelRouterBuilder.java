@@ -12,9 +12,11 @@ import org.springframework.stereotype.Component;
 @Component
 public class CamelRouterBuilder extends RouteBuilder {
 
-    private static String OUTER_DATA_INPUT = "file://D:\\code\\IdeaProjects\\rbkMoneyTest\\src\\main\\resources\\reportDir?fileName=ptxs.csv&noop=true&idempotentKey=${file:name}-${file:modified}";    // todo: move to props
     @BeanInject
     private OuterDataTransactionController outerDataTransactionController;
+
+    private static String OUTER_DATA_INPUT = "file://D:\\code\\IdeaProjects\\rbkMoneyTest\\src\\main\\resources\\reportDir?fileName=ptxs.csv&noop=true&idempotentKey=${file:name}-${file:modified}";    // todo: move to props
+
 
     @Override
     public void configure() {
