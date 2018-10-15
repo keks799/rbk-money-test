@@ -13,8 +13,10 @@ public class NotificationController {
     @Autowired
     private NotificationService notificationService;
 
-    public void report(ReconciliationResult result) { // todo add template mechanism
+    public void report(ReconciliationResult result) {
         log.info(result.toString());
-        notificationService.report(result);
+        if (!(result.getConformityList().isEmpty() && result.getDiscrepancyList().isEmpty() && result.getNotFoundList().isEmpty())) { // todo add to props setup of it
+            notificationService.report(result);
+        }
     }
 }
