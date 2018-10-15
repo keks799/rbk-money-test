@@ -18,8 +18,8 @@ public class OuterDataTransactionController {
         outerDataTransactionProcessingService.processOuterInformation(outerDataContent);
     }
 
-    public List<OuterDataEntity> findOuterDataEntitiesWithStatus(Status status) {
-        return outerDataTransactionProcessingService.findOuterDataEntitiesWithStatus(status);
+    public List<OuterDataEntity> findAllOuterDataEntitiesWithStatuses(Status... statuses) {
+        return outerDataTransactionProcessingService.findAllOuterDataEntitiesWithStatuses(statuses);
     }
 
     public void save(OuterDataEntity newOuterDataEntry) {

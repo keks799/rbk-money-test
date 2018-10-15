@@ -12,8 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-import static money.rbk.test.entity.OuterDataEntity.Status.DONE;
-import static money.rbk.test.entity.OuterDataEntity.Status.NEW;
+import static money.rbk.test.entity.OuterDataEntity.Status.*;
 
 /**
  * Main processing controller
@@ -31,14 +30,14 @@ public class ReconciliationService {
     public ReconciliationResult reconciliation() {
         ReconciliationResult reconciliationResult = new ReconciliationResult();
 
-        List<OuterDataEntity> newOuterDataEntriesList = outerDataTransactionController.findOuterDataEntitiesWithStatus(NEW);
+        List<OuterDataEntity> newOuterDataEntriesList = outerDataTransactionController.findAllOuterDataEntitiesWithStatuses(NEW, NEED_CHECK);
         TransactionEntity storedTransaction;
 
         for (OuterDataEntity newOuterDataEntry : newOuterDataEntriesList) {
             try {
                 storedTransaction = transactionsController.getWithTransactionId(newOuterDataEntry.getTransactionId());
             } catch (IncorrectResultSizeDataAccessException e) {
-                log.error("Not unique transaction record in database. Transaction id is: " + newOuterDataEntry.getId()); // not sure if this will happen
+                log.error("Not unique transaction record in database. Transaction id is: %d", newOuterDataEntry.getId()); // not sure if this will happen
 //                reconciliationResult.getNotUniqueDbRecordsIdList().add(newOuterDataEntry.getTransactionId());
                 continue;
             }

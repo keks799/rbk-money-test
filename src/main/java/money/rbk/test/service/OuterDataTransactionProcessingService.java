@@ -9,6 +9,7 @@ import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.xtext.resource.XtextResourceSet;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.stereotype.Service;
 import org.xtext.money.rbkdsl.RbkMoneyDslStandaloneSetup;
 import org.xtext.money.rbkdsl.RbkMoneyDslStandaloneSetupGenerated;
@@ -23,6 +24,7 @@ import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
 
+import static money.rbk.test.entity.OuterDataEntity.Status.NEED_CHECK;
 import static money.rbk.test.entity.OuterDataEntity.Status.NEW;
 
 /**
@@ -56,13 +58,29 @@ public class OuterDataTransactionProcessingService { // todo unification?
         storeData(transactionsFile);
     }
 
-    private boolean hasNoCounterpats(Long transactionId, BigDecimal amount) {
-        return outerDataRepository.findAllByTransactionIdAndAmount(transactionId, amount).isEmpty();
+    private OuterDataEntity getCounterpart(Long transactionId) throws IncorrectResultSizeDataAccessException {
+        try {
+            return outerDataRepository.findByTransactionId(transactionId);
+        } catch (IncorrectResultSizeDataAccessException e) {
+            log.error("For outer data transaction id " + transactionId + " there are more than one record.", e);
+            throw e;
+        }
     }
 
     private void storeData(TransactionsFile transactionsFile) {
         for (TransactionRecord record : transactionsFile.getTransaction()) {
-            if (hasNoCounterpats(record.getPid().longValue(), record.getPamount())) {
+            final OuterDataEntity counterpart;
+            try {
+                counterpart = getCounterpart(record.getPid().longValue());
+            } catch (IncorrectResultSizeDataAccessException e) {
+                continue;
+            }
+            if (counterpart != null) {
+                counterpart.setStatus(NEED_CHECK);
+                counterpart.setAmount(record.getPamount());
+                counterpart.setData(record.getPdata().toString());
+                outerDataRepository.save(counterpart);
+            } else {
                 outerDataRepository.save(OuterDataEntity.createFromPlainData(record.getPid().longValue(), record.getPamount(),
                         record.getPdata().toString(), NEW)
                 );
@@ -105,8 +123,8 @@ public class OuterDataTransactionProcessingService { // todo unification?
         return (List<TransactionsFile>) (EList) resource.getContents(); // i am 100% sure in this cast
     }
 
-    public List<OuterDataEntity> findOuterDataEntitiesWithStatus(OuterDataEntity.Status status) {
-        return outerDataRepository.findAllByStatus(status);
+    public List<OuterDataEntity> findAllOuterDataEntitiesWithStatuses(OuterDataEntity.Status... statuses) {
+        return outerDataRepository.findAllByStatuses(statuses);
     }
 
     public void save(OuterDataEntity newOuterDataEntry) {

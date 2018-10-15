@@ -5,7 +5,6 @@ import money.rbk.test.entity.OuterDataEntity.Status;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -15,7 +14,7 @@ import java.util.List;
 @Repository
 public interface OuterDataRepository extends CrudRepository<OuterDataEntity, Long> {
 
-    List<OuterDataEntity> findAllByStatus(Status status);
+    List<OuterDataEntity> findAllByStatuses(Status... status);
 
-    List<OuterDataEntity> findAllByTransactionIdAndAmount(Long transactionId, BigDecimal amount);
+    OuterDataEntity findByTransactionId(Long transactionId);
 }

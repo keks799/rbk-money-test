@@ -46,6 +46,7 @@ public class OuterDataEntity {
 
     public enum Status {
         NEW,
+        NEED_CHECK,
         DONE
     }
 }
