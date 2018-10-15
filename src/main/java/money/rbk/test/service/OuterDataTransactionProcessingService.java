@@ -33,7 +33,7 @@ import static money.rbk.test.entity.OuterDataEntity.Status.NEW;
 
 @Service
 @Slf4j
-public class OuterDataTransactionProcessingService { // todo unification?
+public class OuterDataTransactionProcessingService {
 
     @Autowired
     private OuterDataRepository outerDataRepository;

@@ -13,13 +13,12 @@ import org.springframework.stereotype.Service;
 @Service
 public class ReconciliationScheduler {
 
-    private static final long PERIOD = 1L * 60L * 1000L; // todo move to props
     @Autowired
     private ReconciliationController reconciliationController;
     @Autowired
     private NotificationController notificationController;
 
-    @Scheduled(fixedRate = PERIOD)
+    @Scheduled(fixedRateString = "${reconciliation.period.of.time}")
     public void periodicalReconciliation() {
         ReconciliationResult reconciliationResult = reconciliationController.reconciliation();
         notificationController.report(reconciliationResult);

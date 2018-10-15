@@ -3,6 +3,7 @@ package money.rbk.test;
 import money.rbk.test.controller.OuterDataTransactionController;
 import org.apache.camel.BeanInject;
 import org.apache.camel.builder.RouteBuilder;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 /**
@@ -15,14 +16,16 @@ public class CamelRouterBuilder extends RouteBuilder {
     @BeanInject
     private OuterDataTransactionController outerDataTransactionController;
 
-    private static String OUTER_DATA_INPUT = "file://D:\\code\\IdeaProjects\\rbkMoneyTest\\src\\main\\resources\\reportDir?fileName=ptxs.csv&noop=true&idempotentKey=${file:name}-${file:modified}";    // todo: move to props
-
+    @Value("${camel.outer.data.input}") // camel string to read csv file
+    private String outerDataInput;
 
     @Override
     public void configure() {
 
         // process data from .csv, mail, etc.
-        from(OUTER_DATA_INPUT).bean(outerDataTransactionController, "processOuterInformation");
+        from(outerDataInput).bean(outerDataTransactionController, "processOuterInformation");
+
+        restConfiguration();
 
     }
 }

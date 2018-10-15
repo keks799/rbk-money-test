@@ -45,8 +45,8 @@ public class OuterDataEntity {
     }
 
     public enum Status {
-        NEW,
-        NEED_CHECK,
-        DONE
+        NEW,        // new records from file (outer source)
+        NEED_CHECK, // if already processed record in the file (outer source) again. Probably there are any kind of changes (e.g. amount)
+        DONE        // if reconciliation is done
     }
 }
