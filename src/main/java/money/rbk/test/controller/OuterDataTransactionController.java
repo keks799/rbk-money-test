@@ -21,4 +21,8 @@ public class OuterDataTransactionController {
     public List<OuterDataEntity> findOuterDataEntitiesWithStatus(Status status) {
         return outerDataTransactionProcessingService.findOuterDataEntitiesWithStatus(status);
     }
+
+    public void save(OuterDataEntity newOuterDataEntry) {
+        outerDataTransactionProcessingService.save(newOuterDataEntry);
+    }
 }

@@ -46,7 +46,6 @@ public class OuterDataEntity {
 
     public enum Status {
         NEW,
-        RECONCILIATION, // todo
         DONE
     }
 }

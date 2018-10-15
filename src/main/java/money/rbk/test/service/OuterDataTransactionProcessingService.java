@@ -56,11 +56,17 @@ public class OuterDataTransactionProcessingService { // todo unification?
         storeData(transactionsFile);
     }
 
-    private void storeData(TransactionsFile transactionsFile) { // todo think: new record will create even if it already is
+    private boolean hasNoCounterpats(Long transactionId, BigDecimal amount) {
+        return outerDataRepository.findAllByTransactionIdAndAmount(transactionId, amount).isEmpty();
+    }
+
+    private void storeData(TransactionsFile transactionsFile) {
         for (TransactionRecord record : transactionsFile.getTransaction()) {
-            outerDataRepository.save(OuterDataEntity.createFromPlainData(record.getPid().longValue(), record.getPamount(),
-                    record.getPdata().toString(), NEW)
-            );
+            if (hasNoCounterpats(record.getPid().longValue(), record.getPamount())) {
+                outerDataRepository.save(OuterDataEntity.createFromPlainData(record.getPid().longValue(), record.getPamount(),
+                        record.getPdata().toString(), NEW)
+                );
+            }
         }
     }
 
@@ -100,6 +106,10 @@ public class OuterDataTransactionProcessingService { // todo unification?
     }
 
     public List<OuterDataEntity> findOuterDataEntitiesWithStatus(OuterDataEntity.Status status) {
-        return outerDataRepository.findByStatus(status);
+        return outerDataRepository.findAllByStatus(status);
+    }
+
+    public void save(OuterDataEntity newOuterDataEntry) {
+        outerDataRepository.save(newOuterDataEntry);
     }
 }
