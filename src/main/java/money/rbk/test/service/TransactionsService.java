@@ -11,7 +11,7 @@ public class TransactionsService {
     @Autowired
     private TransactionsRepository transactionsRepository;
 
-    public TransactionEntity getWithTransactionId(Long id) {
-        return transactionsRepository.findByTransactionId(id);
+    public TransactionEntity getWithId(Long id) {
+        return transactionsRepository.findById(id).orElse(null);
     }
 }

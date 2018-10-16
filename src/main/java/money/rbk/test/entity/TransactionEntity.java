@@ -20,9 +20,6 @@ public class TransactionEntity {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @Column(name = "transaction_id")
-    private Long transactionId;
-
     @Column(name = "amount")
     private BigDecimal amount;
 

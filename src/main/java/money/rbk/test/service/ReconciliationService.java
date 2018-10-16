@@ -38,7 +38,7 @@ public class ReconciliationService {
 
         for (OuterDataEntity newOuterDataEntry : newOuterDataEntriesList) {
             try {
-                storedTransaction = transactionsController.getWithTransactionId(newOuterDataEntry.getTransactionId()); // fetch transaction from transaction table
+                storedTransaction = transactionsController.getWithId(newOuterDataEntry.getTransactionId()); // fetch transaction from transaction table
             } catch (IncorrectResultSizeDataAccessException e) {
                 log.error("Not unique transaction record in database. Transaction id is: %d", newOuterDataEntry.getId()); // not sure if this will happen
 //                reconciliationResult.getNotUniqueDbRecordsIdList().add(newOuterDataEntry.getTransactionId());

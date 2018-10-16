@@ -14,7 +14,7 @@ public class TransactionsController {
     @Autowired
     private TransactionsService transactionsService;
 
-    public TransactionEntity getWithTransactionId(Long id) {
-        return transactionsService.getWithTransactionId(id);
+    public TransactionEntity getWithId(Long id) {
+        return transactionsService.getWithId(id);
     }
 }
