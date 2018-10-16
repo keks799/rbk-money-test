@@ -142,8 +142,34 @@ public class OuterDataTransactionProcessingService {
         return (List<TransactionsFile>) (EList) resource.getContents(); // i am 100% sure in this cast
     }
 
-    // utility methods
+    /**
+     * Receive transaction information using camel with REST for an example
+     *
+     * @param exchange
+     */
+//    public void processOuterInformationAsRest(Exchange exchange) {
+//        String content;
+//        final Object body = exchange.getIn().getBody();
+//        if (body instanceof String) {
+//            content = (String) body;
+//        } else {
+//            StringWriter writer = new StringWriter();
+//            try {
+//                IOUtils.copy(((InputStream) body), writer, "UTF-8");
+//            } catch (IOException e) {
+//                log.error("Error while receiving rest body", e);
+//            }
+//            content = writer.toString();
+//        }
+//        if (!StringUtils.isEmpty(content)) {
+//            processOuterInformation(content);
+//            exchange.getOut().setBody("Received. Waiting for reconciliation schedule or calling /report method");
+//        } else {
+//            exchange.getOut().setFault(true);
+//        }
+//    }
 
+    // utility methods
     public List<OuterDataEntity> findAllOuterDataEntitiesWithStatuses(OuterDataEntity.Status... statuses) {
         return outerDataRepository.findAllByStatuses(statuses);
     }

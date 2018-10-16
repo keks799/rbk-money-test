@@ -17,4 +17,12 @@ public class ReconciliationController {
     public ReconciliationResult reconciliation() {
         return reconciliationService.reconciliation();
     }
+
+    /**
+     * Receive report using camel with REST for an example
+     * @param exchange
+     */
+//    public void reconciliationOnDemand(Exchange exchange) {
+//        reconciliationService.reconciliationOnDemand(exchange);
+//    }
 }

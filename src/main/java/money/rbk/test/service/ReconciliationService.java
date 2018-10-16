@@ -1,6 +1,7 @@
 package money.rbk.test.service;
 
 import lombok.extern.slf4j.Slf4j;
+import money.rbk.test.controller.NotificationController;
 import money.rbk.test.controller.OuterDataTransactionController;
 import money.rbk.test.controller.TransactionsController;
 import money.rbk.test.entity.OuterDataEntity;
@@ -26,6 +27,8 @@ public class ReconciliationService {
     private OuterDataTransactionController outerDataTransactionController;
     @Autowired
     private TransactionsController transactionsController;
+    @Autowired
+    private NotificationController notificationController;
 
     public ReconciliationResult reconciliation() {
         ReconciliationResult reconciliationResult = new ReconciliationResult();
@@ -61,4 +64,18 @@ public class ReconciliationService {
         newOuterDataEntry.setStatus(DONE);
         outerDataTransactionController.save(newOuterDataEntry);
     }
+
+    /**
+     * Receive report using camel with REST for an example
+     * @param exchange
+     */
+//    public void reconciliationOnDemand(Exchange exchange) {
+//        final ReconciliationResult reconciliation = reconciliation();
+//        try (OutputStream outputStream = notificationController.reportAsStream(reconciliation)) {
+//            exchange.getOut().setBody(outputStream);
+//        } catch (IOException | TemplateException e) {
+//            log.error("Error while prepare report as stream", e);
+//            exchange.getOut().setFault(true);
+//        }
+//    }
 }

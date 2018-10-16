@@ -9,10 +9,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.Writer;
+import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -34,7 +31,7 @@ public class NotificationService {
     @Value("${report.dir.filename}") // report directory and file name format
     private String reportDirFilename;
 
-    public void report(ReconciliationResult result) { // todo add reset
+    public void report(ReconciliationResult result) {
 
         try {
             Template template = freemarkerConfig.getTemplate(templateFileName);
@@ -43,6 +40,19 @@ public class NotificationService {
             }
         } catch (IOException | TemplateException e) {
             e.printStackTrace();
+        }
+    }
+
+    public OutputStream reportAsStream(ReconciliationResult result) throws IOException, TemplateException {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        try {
+            Template template = freemarkerConfig.getTemplate(templateFileName);
+            try (OutputStreamWriter streamWriter = new OutputStreamWriter(outputStream)) {
+                template.process(result, streamWriter);
+                return outputStream;
+            }
+        } catch (IOException | TemplateException e) {
+            throw e;
         }
     }
 }

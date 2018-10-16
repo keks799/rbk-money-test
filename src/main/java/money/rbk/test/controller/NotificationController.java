@@ -1,11 +1,15 @@
 package money.rbk.test.controller;
 
+import freemarker.template.TemplateException;
 import lombok.extern.slf4j.Slf4j;
 import money.rbk.test.model.ReconciliationResult;
 import money.rbk.test.service.NotificationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
+
+import java.io.IOException;
+import java.io.OutputStream;
 
 /**
  * Report/notification controller
@@ -25,5 +29,17 @@ public class NotificationController {
         if (!result.getConformityList().isEmpty() || !result.getDiscrepancyList().isEmpty() || !result.getNotFoundList().isEmpty() || isTurnOn) {
             notificationService.report(result);
         }
+    }
+
+    /**
+     * Retreiving formatted report as stream any cases
+     *
+     * @param result
+     * @return
+     * @throws IOException
+     * @throws TemplateException
+     */
+    public OutputStream reportAsStream(ReconciliationResult result) throws IOException, TemplateException {
+        return notificationService.reportAsStream(result);
     }
 }
