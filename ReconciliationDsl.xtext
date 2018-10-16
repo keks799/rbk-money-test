@@ -1,0 +1,41 @@
+grammar org.xtext.money.rbkdsl.RbkMoneyDsl with org.eclipse.xtext.common.Terminals
+
+import "http://www.eclipse.org/emf/2002/Ecore" as ecore
+
+generate rbkMoneyDsl "http://www.xtext.org/money/rbkdsl/RbkMoneyDsl"
+
+TransactionsFile:
+    'PID;PAMOUNT;PDATA;'NEWLINE
+    transaction+=TransactionRecord*
+    totalLine=TotalLine
+    NEWLINE*
+;
+
+TransactionRecord:
+    pid=NUMBER ';' pamount=NUMBER ';' pdata=NUMBER ';' NEWLINE
+;
+
+TotalLine:
+    'TOTAL;'total=NUMBER';'
+;
+
+
+terminal DOUBLE: INT'.'INT;
+
+terminal WHITE_SPACE:
+    (' ' | '\t')+;
+
+terminal NEWLINE:
+    // New line on DOS or Unix
+    '\r'? '\n';
+
+//@Override
+terminal INT returns ecore::EInt:
+    'this one has been deactivated';
+
+terminal NUMBER returns ecore::EBigDecimal:
+    ('0'..'9')* ('.' ('0'..'9')+)?(('E'|'e')('-'|'+')?('0'..'9')*)?;
+
+terminal SL_COMMENT:
+    // Single line comment
+    '#' !('\n' | '\r')*;
