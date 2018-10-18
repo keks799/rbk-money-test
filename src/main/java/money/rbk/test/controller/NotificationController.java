@@ -32,7 +32,7 @@ public class NotificationController {
     }
 
     /**
-     * Retreiving formatted report as stream any cases
+     * Retrieving formatted report as stream any cases
      *
      * @param result
      * @return

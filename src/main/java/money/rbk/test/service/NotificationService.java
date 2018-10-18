@@ -3,6 +3,7 @@ package money.rbk.test.service;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
+import lombok.extern.log4j.Log4j;
 import money.rbk.test.model.ReconciliationResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,6 +18,7 @@ import java.util.Date;
  * Prepare output data service
  */
 
+@Log4j
 @Service
 public class NotificationService {
 
@@ -39,20 +41,17 @@ public class NotificationService {
                 template.process(result, fileWriter);
             }
         } catch (IOException | TemplateException e) {
+            log.error("Error has been occurred while writing report", e);
             e.printStackTrace();
         }
     }
 
     public OutputStream reportAsStream(ReconciliationResult result) throws IOException, TemplateException {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        try {
-            Template template = freemarkerConfig.getTemplate(templateFileName);
-            try (OutputStreamWriter streamWriter = new OutputStreamWriter(outputStream)) {
-                template.process(result, streamWriter);
-                return outputStream;
-            }
-        } catch (IOException | TemplateException e) {
-            throw e;
+        Template template = freemarkerConfig.getTemplate(templateFileName);
+        try (OutputStreamWriter streamWriter = new OutputStreamWriter(outputStream)) {
+            template.process(result, streamWriter);
+            return outputStream;
         }
     }
 }
