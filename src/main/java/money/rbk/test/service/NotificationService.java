@@ -3,6 +3,7 @@ package money.rbk.test.service;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
+import lombok.extern.slf4j.Slf4j;
 import money.rbk.test.model.ReconciliationResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,6 +18,7 @@ import java.util.Date;
  * Prepare output data service
  */
 
+@Slf4j
 @Service
 public class NotificationService {
 
@@ -30,8 +32,17 @@ public class NotificationService {
     private String templateFileName;
     @Value("${report.dir.filename}") // report directory and file name format
     private String reportDirFilename;
+    @Value("${construct.empty.report.too}") // turn on/off create report file, if nothing is changed
+    private boolean isTurnOn;
 
     public void report(ReconciliationResult result) {
+        log.info(result.toString());
+        if (!result.getConformityList().isEmpty() || !result.getDiscrepancyList().isEmpty() || !result.getNotFoundList().isEmpty() || isTurnOn) {
+            reportProcessing(result);
+        }
+    }
+
+    private void reportProcessing(ReconciliationResult result) {
 
         try {
             Template template = freemarkerConfig.getTemplate(templateFileName);

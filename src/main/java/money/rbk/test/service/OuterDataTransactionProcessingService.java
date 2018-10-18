@@ -39,9 +39,10 @@ public class OuterDataTransactionProcessingService {
     private OuterDataRepository outerDataRepository;
 
     /**
-     * check outer information before store it
+     * Camel use it automatically as soon as it need.
+     * Check outer information before store it
      *
-     * @param outerDataContent
+     * @param outerDataContent - data from outer source (file) as a string
      */
     public void processOuterInformation(String outerDataContent) {
         List<TransactionsFile> objectsFromCsv = getObjectsFromCsv(outerDataContent);
@@ -170,6 +171,13 @@ public class OuterDataTransactionProcessingService {
 //    }
 
     // utility methods
+
+    /**
+     * Looking for entries from outer source, which are not done yet
+     *
+     * @param statuses
+     * @return
+     */
     public List<OuterDataEntity> findAllOuterDataEntitiesWithStatuses(OuterDataEntity.Status... statuses) {
         return outerDataRepository.findAllByStatuses(statuses);
     }

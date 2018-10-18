@@ -1,7 +1,7 @@
 package money.rbk.test;
 
-import money.rbk.test.controller.OuterDataTransactionController;
-import money.rbk.test.controller.ReconciliationController;
+import money.rbk.test.service.OuterDataTransactionProcessingService;
+import money.rbk.test.service.ReconciliationService;
 import org.apache.camel.BeanInject;
 import org.apache.camel.builder.RouteBuilder;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,10 +15,10 @@ import org.springframework.stereotype.Component;
 public class CamelRouterBuilder extends RouteBuilder {
 
     @BeanInject
-    private OuterDataTransactionController outerDataTransactionController;
+    private OuterDataTransactionProcessingService outerDataTransactionService;
 
     @BeanInject
-    private ReconciliationController reconciliationController;
+    private ReconciliationService reconciliationService;
 
     @Value("${camel.outer.data.input}") // camel string to read csv file
     private String outerDataInput;
@@ -34,7 +34,7 @@ public class CamelRouterBuilder extends RouteBuilder {
     public void configure() {
 
         // process data from .csv, mail, etc.
-        from(outerDataInput).bean(outerDataTransactionController, "processOuterInformation");
+        from(outerDataInput).bean(outerDataTransactionService, "processOuterInformation");
 
         // Using rest to post transaction info as an example (plain text format is ok)
 
@@ -44,9 +44,9 @@ public class CamelRouterBuilder extends RouteBuilder {
 //
 //        rest("/v1")
 //                .post("/reconcile")
-//                .to("bean:outerDataTransactionController?method=processOuterInformationAsRest")
+//                .to("bean:outerDataTransactionService?method=processOuterInformationAsRest")
 //                .post("/report")
-//                .to("bean:reconciliationController?method=reconciliationOnDemand");
+//                .to("bean:reconciliationService?method=reconciliationOnDemand");
 
     }
 }

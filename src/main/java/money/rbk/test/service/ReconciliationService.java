@@ -1,9 +1,6 @@
 package money.rbk.test.service;
 
 import lombok.extern.slf4j.Slf4j;
-import money.rbk.test.controller.NotificationController;
-import money.rbk.test.controller.OuterDataTransactionController;
-import money.rbk.test.controller.TransactionsController;
 import money.rbk.test.entity.OuterDataEntity;
 import money.rbk.test.entity.TransactionEntity;
 import money.rbk.test.model.ReconciliationResult;
@@ -24,21 +21,21 @@ import static money.rbk.test.entity.OuterDataEntity.Status.*;
 public class ReconciliationService {
 
     @Autowired
-    private OuterDataTransactionController outerDataTransactionController;
+    private OuterDataTransactionProcessingService outerDataTransactionProcessingService;
     @Autowired
-    private TransactionsController transactionsController;
+    private TransactionsService transactionsService;
     @Autowired
-    private NotificationController notificationController;
+    private NotificationService notificationService;
 
     public ReconciliationResult reconciliation() {
         ReconciliationResult reconciliationResult = new ReconciliationResult();
 
-        List<OuterDataEntity> newOuterDataEntriesList = outerDataTransactionController.findAllOuterDataEntitiesWithStatuses(NEW, NEED_CHECK); // looking for undone transaction records from outer source
+        List<OuterDataEntity> newOuterDataEntriesList = outerDataTransactionProcessingService.findAllOuterDataEntitiesWithStatuses(NEW, NEED_CHECK); // looking for undone transaction records from outer source
         TransactionEntity storedTransaction;
 
         for (OuterDataEntity newOuterDataEntry : newOuterDataEntriesList) {
             try {
-                storedTransaction = transactionsController.getWithId(newOuterDataEntry.getTransactionId()); // fetch transaction from transaction table
+                storedTransaction = transactionsService.getWithId(newOuterDataEntry.getTransactionId()); // fetch transaction from transaction table
             } catch (IncorrectResultSizeDataAccessException e) {
                 log.error("Not unique transaction record in database. Transaction id is: %d", newOuterDataEntry.getId()); // not sure if this will happen
 //                reconciliationResult.getNotUniqueDbRecordsIdList().add(newOuterDataEntry.getTransactionId());
@@ -62,7 +59,7 @@ public class ReconciliationService {
 
     private void markAsProcessed(OuterDataEntity newOuterDataEntry) {
         newOuterDataEntry.setStatus(DONE);
-        outerDataTransactionController.save(newOuterDataEntry);
+        outerDataTransactionProcessingService.save(newOuterDataEntry);
     }
 
     /**
@@ -71,7 +68,7 @@ public class ReconciliationService {
      */
 //    public void reconciliationOnDemand(Exchange exchange) {
 //        final ReconciliationResult reconciliation = reconciliation();
-//        try (OutputStream outputStream = notificationController.reportAsStream(reconciliation)) {
+//        try (OutputStream outputStream = notificationService.reportAsStream(reconciliation)) {
 //            exchange.getOut().setBody(outputStream);
 //        } catch (IOException | TemplateException e) {
 //            log.error("Error while prepare report as stream", e);
