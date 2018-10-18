@@ -26,7 +26,9 @@ public class NotificationController {
 
     public void report(ReconciliationResult result) {
         log.info(result.toString());
-        if (!result.getConformityList().isEmpty() || !result.getDiscrepancyList().isEmpty() || !result.getNotFoundList().isEmpty() || isTurnOn) {
+        if (isTurnOn) {
+            notificationService.report(result);
+        } else if (!result.getConformityList().isEmpty() || !result.getDiscrepancyList().isEmpty() || !result.getNotFoundList().isEmpty()) {
             notificationService.report(result);
         }
     }
