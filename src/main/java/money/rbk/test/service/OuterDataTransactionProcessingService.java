@@ -17,9 +17,9 @@ import org.xtext.money.rbkdsl.rbkMoneyDsl.TotalLine;
 import org.xtext.money.rbkdsl.rbkMoneyDsl.TransactionRecord;
 import org.xtext.money.rbkdsl.rbkMoneyDsl.TransactionsFile;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
@@ -43,7 +43,7 @@ public class OuterDataTransactionProcessingService {
      *
      * @param outerDataContent
      */
-    public void processOuterInformation(String outerDataContent) {
+    public void processOuterInformation(InputStream outerDataContent) {
         List<TransactionsFile> objectsFromCsv = getObjectsFromCsv(outerDataContent);
         if (objectsFromCsv.isEmpty()) {
             log.error("Nothing is read");
@@ -123,18 +123,18 @@ public class OuterDataTransactionProcessingService {
      */
 
     @SuppressWarnings("unchecked")
-    private List<TransactionsFile> getObjectsFromCsv(String outerDataContent) {
+    private List<TransactionsFile> getObjectsFromCsv(InputStream outerDataContent) {
 
         RbkMoneyDslStandaloneSetup.doSetup(); // init dsl model. It's standalone because it can work without eclipse and stuff
         RbkMoneyDslStandaloneSetupGenerated sg = new RbkMoneyDslStandaloneSetup();
         final Injector injector = sg.createInjector(); // get injector to get environment members
 
-        ByteArrayInputStream inputStream = new ByteArrayInputStream(outerDataContent.getBytes());
+//        ByteArrayInputStream inputStream = new ByteArrayInputStream(outerDataContent.getBytes());
         XtextResourceSet resourceSet = injector.getInstance(XtextResourceSet.class);
 
         Resource resource = resourceSet.createResource(URI.createURI("name.rbkdsl")); // *.rbkdsl my own dsl to read ptxs.csv using format
         try {
-            resource.load(inputStream, Collections.EMPTY_MAP); // no args
+            resource.load(outerDataContent, Collections.EMPTY_MAP); // no args
         } catch (IOException e) {
             log.error("Error while reading from resource");
             return Collections.EMPTY_LIST;

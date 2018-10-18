@@ -7,6 +7,7 @@ import money.rbk.test.service.OuterDataTransactionProcessingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
+import java.io.InputStream;
 import java.util.List;
 
 /**
@@ -28,7 +29,7 @@ public class OuterDataTransactionController {
      * camel use it automatically as soon as it need
      * @param outerDataContent - data from outer source (file) as a string
      */
-    public void processOuterInformation(String outerDataContent) {
+    public void processOuterInformation(InputStream outerDataContent) {
         outerDataTransactionProcessingService.processOuterInformation(outerDataContent);
     }
 
