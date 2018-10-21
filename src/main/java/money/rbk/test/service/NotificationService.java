@@ -42,6 +42,7 @@ public class NotificationService {
         if (!isNeedToReport(result)) {
             return null;
         }
+        log.info(result);
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         Template template = freemarkerConfig.getTemplate(templateFileName);
         try (OutputStreamWriter streamWriter = new OutputStreamWriter(outputStream)) {
