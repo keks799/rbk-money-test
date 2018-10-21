@@ -73,7 +73,7 @@ public class ReconciliationService {
     public OutputStream reconciliationToOutputStream() {
         ReconciliationResult reconciliationResult = reconciliation();
         try {
-            return notificationController.reportAsStream(reconciliationResult);
+            return notificationService.reportAsStream(reconciliationResult);
         } catch (IOException | TemplateException e) {
             log.error("Error occurred while creating output stream from report", e);
         }

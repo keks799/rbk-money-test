@@ -103,8 +103,9 @@ public class OuterDataTransactionProcessingService {
 
     /**
      * Any cases. Should be useful. Present information from outer source in xml format, or any other..
+     *
      * @param resourceSet - set of available resources
-     * @param resource - my specified resource, which contains information from outer source
+     * @param resource    - my specified resource, which contains information from outer source
      * @return
      * @throws IOException
      */
