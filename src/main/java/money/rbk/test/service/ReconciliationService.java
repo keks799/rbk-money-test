@@ -1,5 +1,6 @@
 package money.rbk.test.service;
 
+import freemarker.template.TemplateException;
 import lombok.extern.slf4j.Slf4j;
 import money.rbk.test.controller.NotificationController;
 import money.rbk.test.controller.OuterDataTransactionController;
@@ -11,6 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.List;
 
 import static money.rbk.test.entity.OuterDataEntity.Status.*;
@@ -63,6 +66,21 @@ public class ReconciliationService {
     private void markAsProcessed(OuterDataEntity newOuterDataEntry) {
         newOuterDataEntry.setStatus(DONE);
         outerDataTransactionController.save(newOuterDataEntry);
+    }
+
+    /**
+     * Prepare reconciliation as Output stream to use in camel
+     *
+     * @return
+     */
+    public OutputStream reconciliationToOutputStream() {
+        ReconciliationResult reconciliationResult = reconciliation();
+        try {
+            return notificationController.reportAsStream(reconciliationResult);
+        } catch (IOException | TemplateException e) {
+            log.error("Error occurred while creating output stream from report", e);
+        }
+        return null;
     }
 
     /**

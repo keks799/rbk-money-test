@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import money.rbk.test.model.ReconciliationResult;
 import money.rbk.test.service.NotificationService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 
 import java.io.IOException;
@@ -20,18 +19,6 @@ public class NotificationController {
 
     @Autowired
     private NotificationService notificationService;
-
-    @Value("${construct.empty.report.too}") // turn on/off create report file, if nothing is changed
-    private boolean isTurnOn;
-
-    public void report(ReconciliationResult result) {
-        log.info(result.toString());
-        if (isTurnOn) {
-            notificationService.report(result);
-        } else if (!result.getConformityList().isEmpty() || !result.getDiscrepancyList().isEmpty() || !result.getNotFoundList().isEmpty()) {
-            notificationService.report(result);
-        }
-    }
 
     /**
      * Retreiving formatted report as stream any cases
