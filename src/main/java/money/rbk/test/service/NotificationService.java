@@ -9,10 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
+import java.io.*;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * Prepare output data service
@@ -25,31 +24,33 @@ public class NotificationService {
     @Autowired
     private Configuration freemarkerConfig;
 
+    @Value("${report.postfix.date.pattern}") // postfix for report file to prevent erase
+    private String datePattern;
+    private final SimpleDateFormat sdf = new SimpleDateFormat(StringUtils.isEmpty(datePattern) ? "HHmmss" : datePattern);
     @Value("${report.template.filename}") // report template file name
     private String templateFileName;
-    @Value("${construct.empty.report.too}") // turn on/off create report file, if nothing is changed
-    private boolean isTurnOn;
+    @Value("${report.dir.filename}") // report directory and file name format
+    private String reportDirFilename;
 
-    /**
-     * @return - decision to report or not
-     */
-    private boolean shouldReport(ReconciliationResult result) {
-        if (isTurnOn) {
-            return true;
-        } else
-            return !result.getConformityList().isEmpty() || !result.getDiscrepancyList().isEmpty() || !result.getNotFoundList().isEmpty();
+    public void report(ReconciliationResult result) {
+
+        try {
+            Template template = freemarkerConfig.getTemplate(templateFileName);
+            try (Writer fileWriter = new FileWriter(new File(String.format(reportDirFilename, sdf.format(new Date()))))) {
+                template.process(result, fileWriter);
+            }
+        } catch (IOException | TemplateException e) {
+            log.error("Error has been occurred while writing report", e);
+            e.printStackTrace();
+        }
     }
 
-
     public OutputStream reportAsStream(ReconciliationResult result) throws IOException, TemplateException {
-        if (shouldReport(result)) {
-            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-            Template template = freemarkerConfig.getTemplate(templateFileName);
-            try (OutputStreamWriter streamWriter = new OutputStreamWriter(outputStream)) {
-                template.process(result, streamWriter);
-                return outputStream;
-            }
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        Template template = freemarkerConfig.getTemplate(templateFileName);
+        try (OutputStreamWriter streamWriter = new OutputStreamWriter(outputStream)) {
+            template.process(result, streamWriter);
+            return outputStream;
         }
-        return null; // to prevent report file creation
     }
 }

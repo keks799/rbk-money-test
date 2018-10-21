@@ -21,7 +21,7 @@ public class NotificationController {
     private NotificationService notificationService;
 
     /**
-     * Retreiving formatted report as stream any cases
+     * Retrieving formatted report as stream any cases
      *
      * @param result
      * @return
