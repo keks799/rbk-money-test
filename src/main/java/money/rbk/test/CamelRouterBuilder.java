@@ -1,15 +1,13 @@
 package money.rbk.test;
 
-import money.rbk.test.controller.OuterDataTransactionController;
-import money.rbk.test.controller.ReconciliationController;
-import money.rbk.test.service.NotificationService;
+import money.rbk.test.service.OuterDataTransactionProcessingService;
 import money.rbk.test.service.ReconciliationService;
 import org.apache.camel.BeanInject;
-import org.apache.camel.Exchange;
 import org.apache.camel.builder.RouteBuilder;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
+import org.apache.camel.Exchange;
 
 /**
  * Building routes for camel
@@ -19,16 +17,10 @@ import org.springframework.util.StringUtils;
 public class CamelRouterBuilder extends RouteBuilder {
 
     @BeanInject
-    private OuterDataTransactionController outerDataTransactionController;
-
-    @BeanInject
-    private ReconciliationController reconciliationController;
+    private OuterDataTransactionProcessingService outerDataTransactionService;
 
     @BeanInject
     private ReconciliationService reconciliationService;
-
-    @BeanInject
-    private NotificationService notificationService;
 
     @Value("${camel.outer.data.input}") // camel string to read csv file
     private String outerDataInput;
@@ -62,7 +54,7 @@ public class CamelRouterBuilder extends RouteBuilder {
         datePattern = StringUtils.isEmpty(datePattern) ? "YYYYMMddHHmmss" : datePattern;
 
         // process data from .csv, mail, etc.
-        from(outerDataInput).bean(outerDataTransactionController, "processOuterInformation");
+        from(outerDataInput).bean(outerDataTransactionService, "processOuterInformation");
 
         from(String.format("scheduler://reconciliation?delay=%d&initialDelay=%d", period, delay))
                 .to("bean:reconciliationService?method=reconciliationToOutputStream")
@@ -78,9 +70,9 @@ public class CamelRouterBuilder extends RouteBuilder {
 //
 //        rest("/v1")
 //                .post("/reconcile")
-//                .to("bean:outerDataTransactionController?method=processOuterInformationAsRest")
+//                .to("bean:outerDataTransactionService?method=processOuterInformationAsRest")
 //                .post("/report")
-//                .to("bean:reconciliationController?method=reconciliationOnDemand");
+//                .to("bean:reconciliationService?method=reconciliationOnDemand");
 
     }
 }
