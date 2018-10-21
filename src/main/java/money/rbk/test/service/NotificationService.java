@@ -25,12 +25,23 @@ public class NotificationService {
     @Autowired
     private Configuration freemarkerConfig;
 
+    @Value("${construct.empty.report.too}") // turn on/off create report file, if nothing is changed
+    private boolean isTurnOn;
+
     @Value("${report.template.filename}") // report template file name
     private String templateFileName;
-    @Value("${report.dir.filename}") // report directory and file name format
-    private String reportDirFilename;
 
-    public OutputStream reportAsStream(ReconciliationResult result) throws IOException, TemplateException {
+    private boolean isNeedToReport(ReconciliationResult result) {
+        if (isTurnOn) {
+            return true;
+        } else
+            return !result.getConformityList().isEmpty() || !result.getDiscrepancyList().isEmpty() || !result.getNotFoundList().isEmpty();
+    }
+
+    OutputStream reportAsStream(ReconciliationResult result) throws IOException, TemplateException {
+        if (!isNeedToReport(result)) {
+            return null;
+        }
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         Template template = freemarkerConfig.getTemplate(templateFileName);
         try (OutputStreamWriter streamWriter = new OutputStreamWriter(outputStream)) {
